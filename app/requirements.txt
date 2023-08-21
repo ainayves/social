@@ -1,0 +1,14 @@
+black
+Django==4.2.2
+django-bootstrap-v5
+django-formtools==2.4.1
+pre-commit==3.3.3
+python-dotenv==1.0.0
+requests==2.31.0
+ruff==0.0.272
+psycopg2==2.9.6
+psycopg2-binary==2.9.6
+boto3
+#django-simple-sso
+itsdangerous==0.24
+webservices==0.7

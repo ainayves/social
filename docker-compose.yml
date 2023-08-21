@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  # Database
+  postgres:
+    image: postgres:13.11-alpine
+    restart: always
+    env_file:
+      - postgres/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 15s
+      retries: 5
+
+  # Application
+  social:
+    build: app/.
+    command: >
+      sh -c "python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import requests; requests.get('http://127.0.0.1:8000')\""]
+      interval: 60s
+      retries: 10
+      start_period: 15s
+    volumes:
+      - ./app:/app
+    ports:
+      - "8000:8000"
+    stdin_open: true
+    tty: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+    env_file:
+      - app/.env
+      - postgres/.env
+
+  # pgadmin
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: testadmin
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+volumes:
+  pgadmin_data:
