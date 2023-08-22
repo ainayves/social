@@ -12,3 +12,4 @@ boto3
 #django-simple-sso
 itsdangerous==0.24
 webservices==0.7
+django-debug-toolbar
